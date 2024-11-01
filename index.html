@@ -39,7 +39,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
 
-    <script src="./assets/js/main.js"></script>
+    <script id="vertexShader" type="x-shader/x-vertex">
+        void main() {
+            gl_Position = vec4(position, 1.0);
+        }
+    </script>
+    <script id="fragmentShader" type="x-shader/x-fragment">
+
+        uniform vec2 iResolution;
+        uniform float iTime;
+        uniform float scrollOffset;
+
+        void mainImage(out vec4 o, vec2 I) {
+            I -= o.zw = iResolution.xy / 2.0;
+            float t = iTime * 5.0 + scrollOffset * 200.0;           
+            float pattern = sin(atan(I.y, I.x) / 0.1) * sin(20.0 * (o.w /= length(I)) + t) - 1.0 + o.w;
+
+            float monochrome = 1.0 - pattern * 0.5;
+
+            float invertedMonochrome = 1.0 - monochrome;
+
+            o = vec4(invertedMonochrome, invertedMonochrome, invertedMonochrome, 1.0);
+        }
+
+        void main() {
+            mainImage(gl_FragColor, gl_FragCoord.xy);
+        }
+    </script>
+
+    <script src="./assets/js/main.js" type="module"></script>
 </body>
 
 </html>
